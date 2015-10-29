@@ -1,0 +1,13 @@
+CREATE TABLE `users` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `unique_id` varchar(23) NOT NULL,
+    `name` varchar(50) NOT NULL,
+    `email` varchar(100) NOT NULL,
+    `encrypted_password` varchar(80) NOT NULL,
+    `salt` varchar(10) NOT NULL,
+    `created_at` datetime DEFAULT NULL,
+    `updated_at` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_id` (`unique_id`),
+    UNIQUE KEY `email` (`email`)
+)  ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2;
