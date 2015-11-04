@@ -25,11 +25,20 @@
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" >
-
         </activity>
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".QRActivity"
+            android:label="@string/title_activity_qr"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".EquipmentActivity"
+            android:label="@string/title_activity_equipment"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>

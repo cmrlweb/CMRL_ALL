@@ -15,6 +15,8 @@ class DB_Functions {
         // connecting to database
         $db = new Db_Connect();
         $this->conn = $db->connect();
+
+
     }
 
     // destructor
@@ -32,7 +34,7 @@ class DB_Functions {
         $encrypted_password = $hash["encrypted"]; // encrypted password
         $salt = $hash["salt"]; // salt
 
-        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, ?, NOW())");
+        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at,lastloggedin) VALUES(?, ?, ?, ?, ?, NOW(),NULL)");
         $stmt->bind_param("sssss", $uuid, $name, $email, $encrypted_password, $salt);
         $result = $stmt->execute();
         $stmt->close();
@@ -116,6 +118,41 @@ class DB_Functions {
         $hash = base64_encode(sha1($password . $salt, true) . $salt);
 
         return $hash;
+    }
+
+    public function lastlogged($timelogged , $email){
+        $stmt = $this->conn->prepare("UPDATE users SET lastloggedin= ? WHERE email = ? ");
+        $stmt->bind_param("ss", $timelogged, $email);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        if($result)
+            return true;
+    }
+
+    public function assetdetails($ASSETCODE)
+    {
+        $stmt = $link->prepare("SELECT Ecode FROM AssetCodes WHERE ASSETCODE= ?");
+        $stmt->bind_param("s", $ASSETCODE);
+        $stmt->execute();
+        $stmt->bind_result($Ecode);
+        $stmt->fetch();
+
+        if($Ecode == '1')
+            $AssetName = "Tunnel_Ventilation_Fan";
+        else if($Ecode == '2')
+            $AssetName = "Tunnel_Ventilation_Damper";
+
+        $stmt->close();
+
+        $stmt = $link2->prepare('SELECT location,installdate FROM ? WHERE ASSETCODE = ?');
+        $stmt->bind_param("ss",$AssetName,$ASSETCODE);
+        $stmt->execute();
+        $stmt->bind_result($AssetLocation,$AssetInstallDate);
+        $stmt->fetch();
+        $stmt->close();
+
+        $assetdetails = array("AssetName"=>"$", "AssetLocation"=>"37", "AssetInstallDate"=>"43");
     }
 
 }

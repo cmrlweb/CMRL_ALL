@@ -1,5 +1,10 @@
 package com.example.administrator.cmrl;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,10 +14,25 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.android.volley.Request;
+import com.android.volley.Request.Method;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.example.administrator.cmrl.app.AppConfig;
+import com.example.administrator.cmrl.app.AppController;
 import com.example.administrator.cmrl.helper.SQLiteHandler;
 import com.example.administrator.cmrl.helper.SessionManager;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,13 +40,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private TextView txtName;
     private TextView txtEmail;
     private Button btnLogout;
     private Button btnqrcode;
+    private ProgressDialog pdia;
 
     private SQLiteHandler db;
     private SessionManager session;
@@ -70,41 +96,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         btnqrcode.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-                scanqrcode();
+                Intent qrintent = new Intent(MainActivity.this,QRActivity.class);
+                startActivityForResult(qrintent,0);
             }
         });
+
+
     }
 
     /**
      * Logging out the user. Will set isLoggedIn flag to false in shared
      * preferences Clears the user data from sqlite users table
      * */
+
+
     private void logoutUser() {
         session.setLogin(false);
 
         db.deleteUsers();
+
+        //Cancelling all Requests
+        AppController.getInstance().cancelPendingRequests(TAG);
 
         // Launching the login activity
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
-    private void scanqrcode()
-    {
-   //     IntentIntegrator.initiateScan(this);
+
+    private void showDialog() {
+        if (!pdia.isShowing())
+            pdia.show();
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-     //   IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-     //   if (scanResult != null) {
-            // handle scan result
-       //     tvScanResults.setText(scanResult.getContents());
-   //     } else {
-            // else continue with any other code you need in the method
-     //       Log.v("BarcodeActivity", "No result");
-    //    }
+    private void hideDialog(){
+        if (pdia.isShowing()) {
+            try
+            {
+                Thread.sleep(100);
+                pdia.dismiss();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 }

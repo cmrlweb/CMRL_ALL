@@ -18,6 +18,8 @@ class DB_Functions {
         
     }
 
+   
+
     /**
      * Storing new user
      * returns user details
@@ -38,7 +40,8 @@ class DB_Functions {
             $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
-            $user = $stmt->get_result()->fetch_assoc();
+            $RESULT = get_resultin($stmt);
+            $user = array_shift( $RESULT );
             $stmt->close();
 
             return $user;
@@ -57,7 +60,8 @@ class DB_Functions {
         $stmt->bind_param("s", $email);
 
         if ($stmt->execute()) {
-            $user = $stmt->get_result()->fetch_assoc();
+            $RESULT = get_resultin($stmt);
+            $user = array_shift( $RESULT );
             $stmt->close();
             return $user;
         } else {
@@ -114,6 +118,29 @@ class DB_Functions {
         return $hash;
     }
 
+    public function lastlogged($timelogged , $email){
+        $stmt = $this->conn->prepare("UPDATE users SET lastloggedin= ? WHERE email = ? ");
+        $stmt->bind_param("ss", $timelogged, $email );
+        $result = $stmt->execute();
+        $stmt->close();
+
+        if($result)
+            return true;
+    }
 }
 
+    function get_resultin( $Statement ) {
+    $RESULT = array();
+    $Statement->store_result();
+    for ( $i = 0; $i < $Statement->num_rows; $i++ ) {
+        $Metadata = $Statement->result_metadata();
+        $PARAMS = array();
+        while ( $Field = $Metadata->fetch_field() ) {
+            $PARAMS[] = &$RESULT[ $i ][ $Field->name ];
+        }
+        call_user_func_array( array( $Statement, 'bind_result' ), $PARAMS );
+        $Statement->fetch();
+    }
+    return $RESULT;
+    }
 ?>

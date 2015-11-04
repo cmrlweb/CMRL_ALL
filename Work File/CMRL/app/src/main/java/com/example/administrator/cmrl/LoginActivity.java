@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.Request.*;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.administrator.cmrl.app.AppConfig;
 import com.example.administrator.cmrl.app.AppController;
@@ -25,8 +27,13 @@ import com.example.administrator.cmrl.helper.SessionManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class LoginActivity extends AppCompatActivity {private static final String TAG = RegisterActivity.class.getSimpleName();
     private Button btnLogin;
@@ -106,6 +113,14 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
         // Tag used to cancel the request
         String tag_string_req = "req_login";
 
+        //Getting Calendar Time for Last Logged in.
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"));
+        Date currentLocalTime = cal.getTime();
+        DateFormat date = new SimpleDateFormat("HH:mm:ss a");
+        date.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
+        final String localTime = date.format(currentLocalTime);
+        Log.v(TAG, localTime);
+
         pDialog.setMessage("Logging in ...");
         showDialog();
 
@@ -129,7 +144,8 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
 
                         // Now store the user in SQLite
                         String uid = jObj.getString("uid");
-
+                        String message = jObj.getString("message");
+                        Log.v(TAG,message);
                         JSONObject user = jObj.getJSONObject("user");
                         String name = user.getString("name");
                         String email = user.getString("email");
@@ -174,6 +190,7 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("email", email);
                 params.put("password", password);
+                params.put("timelogged", localTime);
 
                 return params;
             }
@@ -183,6 +200,7 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
+
 
     private void showDialog() {
         if (!pDialog.isShowing())
