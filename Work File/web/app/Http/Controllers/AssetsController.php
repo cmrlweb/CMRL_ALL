@@ -75,8 +75,9 @@ class AssetsController extends Controller
     public function edit($id)
     {
         $AC = AssetCodes::find($id);
+        $Enames = Equipment::all();
 
-        return view('asset.edit',compact('AC'));
+        return view('asset.edit',compact('AC','Enames'));
     }
 
     /**
@@ -86,9 +87,27 @@ class AssetsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update()
     {
-        //
+        $aid = Input::get('ID');
+
+        $asset = AssetCodes::find($aid);
+
+        $asset->assetcode = Input::get('assetcode');
+
+        $asset->Ecode = Input::get('selector');
+
+        $mod = Input::get('modify');
+
+        if($mod == 'Edit')
+        {
+            // $asset->save();
+        }
+        elseif($mod == 'Delete')
+        {
+            // $asset->delete();
+        }
+         return Redirect::to('/');
     }
 
     /**

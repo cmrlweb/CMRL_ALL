@@ -20,6 +20,7 @@ Route::get('/assets/add',['middleware' => 'auth','uses' => 'AssetsController@add
 Route::post('/assets/add',['middleware' => 'auth','uses' => 'AssetsController@create']);
 Route::get('/assets/equipment',['middleware' => 'auth','uses' => 'AssetsController@equipment']);
 Route::post('/assets/equipment',['middleware' => 'auth','uses' => 'AssetsController@addequip']);
+Route::post('/assets/modify',['middleware' => 'auth','uses' => 'AssetsController@update']);
 Route::get('/assets/edit/{id}',['middleware' => 'auth','uses' => 'AssetsController@edit']);
 Route::get('/assets/delete/{id}',['middleware' => 'auth','uses' => 'AssetsController@destroy']);
 
