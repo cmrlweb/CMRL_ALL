@@ -40,7 +40,6 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">AssetCode<span class="caret"></span></a>
 							<ul class="dropdown-menu" role="menu">
 								<li><a href="/assets/list">List</a></li>
-								<li><a href="/assets/equipment">Add Equipment</a></li>
 							</ul>
 					</li>
 					<li class="dropdown">
