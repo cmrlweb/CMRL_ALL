@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace CMRL;
 
 use Illuminate\Database\Eloquent\Model;
 

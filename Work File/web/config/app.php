@@ -137,14 +137,15 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         'Illuminate\Html\HtmlServiceProvider',
+        'Zizaco\Entrust\EntrustServiceProvider',
 
         /*
          * Application Service Providers...
          */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
+        CMRL\Providers\AppServiceProvider::class,
+        CMRL\Providers\AuthServiceProvider::class,
+        CMRL\Providers\EventServiceProvider::class,
+        CMRL\Providers\RouteServiceProvider::class,
         Bestmomo\Scafold\ScafoldServiceProvider::class,
 
     ],
@@ -197,6 +198,7 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
         'Form'      => 'Illuminate\Html\FormFacade',
         'HTML'      => 'Illuminate\Html\HtmlFacade',
+        'Entrust' => 'Zizaco\Entrust\EntrustFacade'
 
     ],
 

@@ -14,6 +14,19 @@
 Route::get('/',['middleware' => 'auth','uses' => 'HomeController@index']);
 
 
+//Sudden Changes to be hard coded
+Route::get('/onetime',['middleware' => 'auth','uses' => 'HomeController@onetime']);
+
+//Errors Archiving
+Route::post('/errors',['middleware' => 'auth','uses' => 'HomeController@errors']);
+
+
+
+//History of the AssetCodes
+Route::get('/history',['middleware' => 'auth','uses' => 'HomeController@show']);
+Route::post('/history',['middleware' => 'auth','uses' => 'HomeController@history']);
+
+
 //Maintaining the Asset Codes
 Route::get('/assets/list',['middleware' => 'auth','uses' => 'AssetsController@index']);
 Route::get('/assets/add',['middleware' => 'auth','uses' => 'AssetsController@addpage']);

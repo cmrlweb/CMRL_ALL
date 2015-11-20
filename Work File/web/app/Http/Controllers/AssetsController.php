@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace CMRL\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\AssetCodes;
-use App\Equipment;
+use CMRL\AssetCodes;
+use CMRL\Equipment;
 use Input;
 use Illuminate\Support\Facades\Redirect;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use CMRL\Http\Requests;
+use CMRL\Http\Controllers\Controller;
 
 class AssetsController extends Controller
 {

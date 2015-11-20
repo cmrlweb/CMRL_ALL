@@ -4,10 +4,10 @@ namespace CMRL;
 
 use Illuminate\Database\Eloquent\Model;
 
-class errorlog extends Model
+class history extends Model
 {
-    protected $table ="errorlog";
+    protected $table ="history";
     protected $primaryKey = "id";
-    
-    public $timestamps = false;
+
+     public $timestamps = false;
 }

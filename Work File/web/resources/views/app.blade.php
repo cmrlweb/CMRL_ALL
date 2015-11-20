@@ -55,6 +55,9 @@
 								<li><a href="/maintainence/list">List</a></li>
 							</ul>
 					</li>
+					<li class="dropdown">
+							<a href="/history" role="button" aria-expanded="false">History</span></a>
+					</li>
 					@endif
 				</ul>
 				

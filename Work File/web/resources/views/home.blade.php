@@ -16,16 +16,19 @@
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
 				<div class="panel-heading">Errors</div>
-
-				<div class="panel-body">
+				{!! Form::open(array('url' => '/errors', 'class' => 'form-horizontal'))!!}
+				<div class="panel-body form-group">
 					@foreach ($err as $index => $errors) 
 					<ul>
 						@if ($errors->archive == 0)
-						<li><input type="checkbox" name="{{$errors->id}}" value=" "> {{$errors->id}} {{$errors->Name}} {{$errors->Message}} {{$errors->assetcode}}</li>
+						<li><input type="checkbox" name="archiver[]" value="{{$errors->id}}"> {{$errors->id}} {{$errors->Name}} {{$errors->Message}} {{$errors->assetcode}}</li>
+						<?php $errorcount = 1 ?>
 						@endif
 					</ul>
 					@endforeach
+						<input class="btn-info" type="submit" value="Remove">
 				</div>
+				{!! Form::close()!!}
 			</div>
 		</div>
 	</div>

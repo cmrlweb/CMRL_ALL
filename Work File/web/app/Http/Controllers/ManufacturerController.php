@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace CMRL\Http\Controllers;
 
-use App\AssetCodes;
-use App\Equipment;
+use CMRL\AssetCodes;
+use CMRL\Equipment;
 use Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
-use App\Manufacturer;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use CMRL\Manufacturer;
+use CMRL\Http\Requests;
+use CMRL\Http\Controllers\Controller;
 
 class ManufacturerController extends Controller
 {
