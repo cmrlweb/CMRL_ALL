@@ -73,6 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
         // Register Button Click event
         btnRegister.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                /*
                 String name = inputFullName.getText().toString().trim();
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
@@ -84,6 +85,8 @@ public class RegisterActivity extends AppCompatActivity {
                             "Please enter your details!", Toast.LENGTH_LONG)
                             .show();
                 }
+                */
+                Toast.makeText(RegisterActivity.this, "RESTRICTED", Toast.LENGTH_SHORT).show();
             }
         });
 

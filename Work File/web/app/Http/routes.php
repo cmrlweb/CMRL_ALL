@@ -14,11 +14,20 @@
 Route::get('/',['middleware' => 'auth','uses' => 'HomeController@index']);
 
 
+
+//Android API Work
+Route::get('/api/login',['middleware' => 'auth','uses' => 'AndroidController@login']);
+
+
+
 //Sudden Changes to be hard coded
 Route::get('/onetime',['middleware' => 'auth','uses' => 'HomeController@onetime']);
 
 //Errors Archiving
 Route::post('/errors',['middleware' => 'auth','uses' => 'HomeController@errors']);
+
+//Roles to be assigned
+Route::get('/roles',['middleware' => 'auth','uses' => 'HomeController@roles']);
 
 
 

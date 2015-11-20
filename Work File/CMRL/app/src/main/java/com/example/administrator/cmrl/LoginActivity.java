@@ -97,10 +97,13 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
         btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
+                /*
                 Intent i = new Intent(getApplicationContext(),
                         RegisterActivity.class);
                 startActivity(i);
                 finish();
+                */
+                Toast.makeText(LoginActivity.this, "RESTRICTED", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -113,13 +116,6 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
         // Tag used to cancel the request
         String tag_string_req = "req_login";
 
-        //Getting Calendar Time for Last Logged in.
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"));
-        Date currentLocalTime = cal.getTime();
-        DateFormat date = new SimpleDateFormat("HH:mm:ss a");
-        date.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
-        final String localTime = date.format(currentLocalTime);
-        Log.v(TAG, localTime);
 
         pDialog.setMessage("Logging in ...");
         showDialog();
@@ -143,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
                         session.setLogin(true);
 
                         // Now store the user in SQLite
-                        String uid = jObj.getString("uid");
+                        String uid = jObj.getString("id");
                         String message = jObj.getString("message");
                         Log.v(TAG,message);
                         JSONObject user = jObj.getJSONObject("user");
@@ -160,6 +156,7 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
                                 MainActivity.class);
                         startActivity(intent);
                         finish();
+
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
@@ -190,8 +187,6 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("email", email);
                 params.put("password", password);
-                params.put("timelogged", localTime);
-
                 return params;
             }
 

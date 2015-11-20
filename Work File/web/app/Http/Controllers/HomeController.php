@@ -22,8 +22,15 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $currentuserid = Auth::user()->id;
+        $user = User::where('id', '=', $currentuserid)->first();
+        $adminid=0;
+        
+        if($user->hasRole('admin'))
+            $adminid=1; 
+        
         $err = errorlog::all();
-        return view('home',compact('err'));
+        return view('home',compact('adminid','err'));
     }
 
     /**
@@ -111,19 +118,26 @@ class HomeController extends Controller
 
     public function errors()
     {
-        $archive = Input::get('archiver');
+        $arch = Input::get('archiver');
 
-        foreach($archive as $index => $archiver)
+        foreach($arch as $index => $archiver)
         {
             $value = $archiver[$index];
+
             $error = errorlog::where('id',$value)->first();
 
             $error->archive = 1;
 
             $error->save();
-
-            return Redirect::to('/');
         }
+        return Redirect::to('/');
         
+    }
+
+    public function roles()
+    {
+        $allusers = User::all();
+
+        return view('roles.users',compact('allusers'));
     }
 }
