@@ -1,0 +1,1 @@
+[29-Oct-2015 11:56:53 UTC] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 32 bytes) in /home/cmrlweb/public_html/QRCODE/lib/IMagickLuminanceSource.php on line 63

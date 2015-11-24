@@ -4,10 +4,13 @@ namespace CMRL\Http\Controllers;
 
 use Illuminate\Http\Request;
 use CMRL\AssetCodes;
+use CMRL\Maintainence;
 use CMRL\Equipment;
+use CMRL\Tunnel_Ventillation_Fan;
+use CMRL\Tunnel_Ventillation_Damper;
 use Input;
 use Illuminate\Support\Facades\Redirect;
-
+use DB;
 use CMRL\Http\Requests;
 use CMRL\Http\Controllers\Controller;
 
@@ -144,6 +147,36 @@ class AssetsController extends Controller
         // $Equip->save();
 
         return Redirect::to('/');
+
+    }
+
+    public function report()
+    {
+        $assetcode = Input::get('assetcode');
+        $operator = Input::get('username');
+
+        $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
+
+        $Ecode = $AssetDet->Ecode;
+
+        $MachineDet = Equipment::where('Ecode',$Ecode)->first();
+        $MachineName = $MachineDet->Name;
+
+        $Maintain = Maintainence::where('Ecode',$Ecode)->get();
+        foreach($Maintain as $index => $maintain)
+        {
+            $MachineDesc[] = $maintain->Name;
+        }
+
+        $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."'";
+        $Details = DB::connection('mysql2')->select($query);
+
+        foreach($Maintain as $i => $maintain){
+            $desc = $MachineDesc[$i];
+            $Machvalue[] = $Details[0]->$desc;
+        }
+
+        return view('report',compact('assetcode','operator','Maintain','AssetDet','MachineDesc','Machvalue'));
 
     }
 }

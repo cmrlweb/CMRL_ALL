@@ -18,7 +18,8 @@ Route::get('/',['middleware' => 'auth','uses' => 'HomeController@index']);
 //Android API Work
 Route::get('/api/login',['middleware' => 'auth','uses' => 'AndroidController@login']);
 
-
+//Report Generation
+Route::post('/report',['middleware' => 'auth','uses' => 'AssetsController@report']);
 
 //Sudden Changes to be hard coded
 Route::get('/onetime',['middleware' => 'auth','uses' => 'HomeController@onetime']);

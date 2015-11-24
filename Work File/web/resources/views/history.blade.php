@@ -45,13 +45,19 @@
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
 				<div class="panel-heading">Results</div>
-
+				{!! Form::open(array('url' => '/report')) !!}
 				<div class="panel-body">
 					@if (isset($data))
 						@if($data != NULL)
 						@foreach ($data as $index => $history)
 						<ul>
-							<li>{{$history->id}}  {{$history->assetcode}} {{$history->username}} {{$history->created_at}} {{$history->status}}</li>
+							<li>{{$history->id}}  {{$history->assetcode}} {{$history->username}} {{$history->created_at}} {{$history->status}} 
+								@if ($history->status == "CHANGED")
+								<input type="hidden" name="assetcode" value="{{ $history->assetcode }}"> 
+								<input type="hidden" name="username" value="{{ $history->username }}">
+								{!!Form::submit('Generate Report') !!}
+								@endif
+							</li>
 						</ul>
 						@endforeach
 						@else
@@ -61,6 +67,7 @@
 						<h5>Enter Asset Code </h5>
 					@endif
 				</div>
+				{!! Form::close() !!}
 			</div>
 		</div>
 	</div>

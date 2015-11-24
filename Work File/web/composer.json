@@ -10,7 +10,8 @@
         "bestmomo/scafold": "dev-master",
         "zizaco/entrust": "dev-laravel-5",
         "illuminate/html": "~5.0",
-        "anahkiasen/former": "4.0.*@dev"
+        "anahkiasen/former": "4.0.*@dev",
+        "nesbot/carbon": "^1.21"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
