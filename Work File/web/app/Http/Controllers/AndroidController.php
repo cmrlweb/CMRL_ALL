@@ -3,7 +3,9 @@
 namespace CMRL\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Input;
+use CMRL\User;
+use Auth;
 use CMRL\Http\Requests;
 use CMRL\Http\Controllers\Controller;
 
@@ -11,16 +13,13 @@ class AndroidController extends Controller
 {
     public function login()
     {
+
     	//Getting Login Request from app.
     	$email = Input::get('email');
     	$password = Input::get('password');
 
-    	$success = Auth::attempt(['email' => $email, 'password' => $password],true);
-
     	if($success)
     	{
-
-    		$currentuserid = Auth::user()->id;
         	$user = User::where('id', '=', $currentuserid)->first();
     		
     		// user is found
@@ -38,6 +37,13 @@ class AndroidController extends Controller
         	$response["error_msg"] = "Login credentials are wrong. Please try again!";
         	echo json_encode($response);
     	}
-
+    }
+    public function register()
+    {
+        return view('androidregister');
+    }
+    public function store()
+    {
+        return Input::all();
     }
 }

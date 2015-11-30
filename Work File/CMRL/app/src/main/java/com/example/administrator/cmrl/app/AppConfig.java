@@ -6,7 +6,7 @@ package com.example.administrator.cmrl.app;
 
 public class AppConfig {
     // Server user login url
-    public static String URL_LOGIN = "http://cmrlweb.com/android_api/login.php";
+    public static String URL_LOGIN = "http://192.168.202.245:8080/api/login";
 
     // Server user register url
     public static String URL_REGISTER = "http://cmrlweb.com/android_api/register.php";

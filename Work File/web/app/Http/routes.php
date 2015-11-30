@@ -15,8 +15,10 @@ Route::get('/',['middleware' => 'auth','uses' => 'HomeController@index']);
 
 
 
-//Android API Work
-Route::get('/api/login',['middleware' => 'auth','uses' => 'AndroidController@login']);
+//Android API Work and all stuff related to android.
+Route::post('/api/login','AndroidController@login');
+Route::get('/android/register',['middleware' => 'auth','uses' => 'AndroidController@register']);
+Route::post('/android/register',['middleware' => 'auth','uses' => 'AndroidController@store']);
 
 //Report Generation
 Route::post('/report',['middleware' => 'auth','uses' => 'AssetsController@report']);

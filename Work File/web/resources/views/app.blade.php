@@ -66,13 +66,14 @@
 						@if(!Request::is('auth/login'))
 							<li><a href="{{ url('/auth/login') }}">Login</a></li>
 						@endif
+						@if(!Request::is('auth/register'))
+									<li ><a href="{{ url('/auth/register') }}">Register</a></li>
+						@endif
 					@else
 						@if (isset($adminid))
 							@if($adminid == 1)
-								@if(!Request::is('auth/register'))
-									<li><a href="{{ url('/auth/register') }}">Register</a></li>
-								@endif
 								<li><a href="/roles">Roles</a></li>
+								<li><a href="/android/register">Register Web User</a></li>
 							@endif
 						@endif
 						<li class="dropdown">

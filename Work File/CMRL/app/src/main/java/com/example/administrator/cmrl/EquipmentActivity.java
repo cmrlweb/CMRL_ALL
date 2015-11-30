@@ -1,6 +1,7 @@
 package com.example.administrator.cmrl;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.support.design.widget.TabLayout;
@@ -10,8 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,8 +53,6 @@ public class EquipmentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equipment);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         //Getting Values from Old Intent
         Bundle extras = getIntent().getExtras();
@@ -58,6 +61,7 @@ public class EquipmentActivity extends AppCompatActivity {
             getAssetDetails(ASSETCODE);
             Log.v(TAG,ASSETCODE);
         }
+
 
         //Going Further with Proceed
         proceed = (Button) findViewById(R.id.btnproceed);
@@ -85,7 +89,15 @@ public class EquipmentActivity extends AppCompatActivity {
         IL = (LinearLayout) findViewById(R.id.llInner);
         AssetCode = (TextView) findViewById(R.id.tvAssetCode);
         AssetName = (TextView) findViewById(R.id.tvAssetName);
+        Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
+        final CheckBox[] Machine = new CheckBox[20];
+
+        for(int i=1;i<=8;i++) {
+            int resID = getResources().getIdentifier("checkBox" + i, "id", getPackageName());
+            Machine[i-1] = (CheckBox)findViewById(resID);
+
+        }
 
         StringRequest req = new StringRequest(Request.Method.POST,
                 AppConfig.URL_ASSETCODE,new Response.Listener<String>() {
@@ -99,32 +111,23 @@ public class EquipmentActivity extends AppCompatActivity {
 
                     boolean error = mainObj.getBoolean("error");
 
+                    JSONArray MachineDesc =mainObj.getJSONArray("MachineDesc");
+
+                    JSONArray Value =mainObj.getJSONArray("Machvalue");
+
                     if(!error)
                     {
-                        //To get the Rows too
-                        int rows=0;
 
-                        //Getting Array of values from JSON OBJECT.
-                        Iterator<String> iter = mainObj.keys();
-                        while (iter.hasNext()) {
+                        for(int i=0;i < MachineDesc.length(); i++)
+                        {
+                            String Machinefunc = MachineDesc.getJSONObject(i).getString("name");
+                            Machine[i].setText(Machinefunc);
 
-                            String key = iter.next();
-                            keyJSON[rows] = key;
-
-                            try {
-                                Object value = mainObj.get(key);
-                                valJSON[rows] = value.toString();
-                                //Storing the values for specific Keys.
-
-                            } catch (JSONException e) {
-                                // Something went wrong!
-                                Log.v(TAG,"KEY JSON OR VAL JSON Problem.");
+                            if(Value.getJSONObject(i).getInt("name") != 0)
+                            {
+                                Machine[i].isChecked();
                             }
                         }
-
-
-                        AssetCode.setText(valJSON[2]);
-                        AssetName.setText(valJSON[3]);
                     }
                     else
                     {
@@ -153,7 +156,6 @@ public class EquipmentActivity extends AppCompatActivity {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<>();
                 params.put("ASSETCODE", ASSETCODE);
-
                 return params;
             }
 
@@ -163,3 +165,30 @@ public class EquipmentActivity extends AppCompatActivity {
     }
 
 }
+
+
+/*
+                        int rows=0;
+
+                        //Getting Array of values from JSON OBJECT.
+                        Iterator<String> iter = mainObj.keys();
+                        while (iter.hasNext()) {
+
+                            String key = iter.next();
+                            keyJSON[rows] = key;
+
+                            try {
+                                Object value = mainObj.get(key);
+                                valJSON[rows] = value.toString();
+                                //Storing the values for specific Keys.
+
+                            } catch (JSONException e) {
+                                // Something went wrong!
+                                Log.v(TAG,"KEY JSON OR VAL JSON Problem.");
+                            }
+                        }
+
+
+                        AssetCode.setText(valJSON[2]);
+                        AssetName.setText(valJSON[3]);
+ */
