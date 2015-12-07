@@ -5,11 +5,14 @@ import android.content.Context;
 import android.os.Bundle;
 
 import android.support.design.widget.TabLayout;
+
+import java.util.Calendar;
 import java.util.Iterator;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -46,6 +49,7 @@ public class EquipmentActivity extends AppCompatActivity {
     private Button goback;
     private String ASSETCODE;
     private LinearLayout IL;
+    private String nowTime;
     private String keyJSON[];
     private String valJSON[];
 
@@ -85,6 +89,14 @@ public class EquipmentActivity extends AppCompatActivity {
 
     private void getAssetDetails(final String ASSETCODE)
     {
+
+        Calendar timePresent = Calendar.getInstance();
+        nowTime = timePresent.get(Calendar.DATE) + "/" +
+                timePresent.get(Calendar.MONTH) + "/" +
+                timePresent.get(Calendar.YEAR) + "::" +
+                timePresent.get(Calendar.HOUR) + ":" +
+                timePresent.get(Calendar.MINUTE);
+
         String asset_req = "Asset_Request";
         IL = (LinearLayout) findViewById(R.id.llInner);
         AssetCode = (TextView) findViewById(R.id.tvAssetCode);
@@ -127,6 +139,20 @@ public class EquipmentActivity extends AppCompatActivity {
                             {
                                 Machine[i].isChecked();
                             }
+                        }
+
+                        //Sending SMS to all the people specified.
+                        try{
+
+                            SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage("9445868313",null,"Changes Made to "+ ASSETCODE + " Timestamp - " + nowTime +".",null,null);
+                            Toast.makeText(EquipmentActivity.this, "SMS Sent!",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        catch(Exception e)
+                        {
+                            Toast.makeText(EquipmentActivity.this, "Problem with sending SMS", Toast.LENGTH_SHORT).show();
+                            Log.v(TAG,"Error in sending message in SMS.");
                         }
                     }
                     else

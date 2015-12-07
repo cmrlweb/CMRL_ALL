@@ -4,7 +4,10 @@ namespace CMRL\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Input;
+use Hash;
+use Illuminate\Support\Facades\Redirect;
 use CMRL\User;
+use CMRL\apiuser;
 use Auth;
 use CMRL\Http\Requests;
 use CMRL\Http\Controllers\Controller;
@@ -13,37 +16,46 @@ class AndroidController extends Controller
 {
     public function login()
     {
-
-    	//Getting Login Request from app.
-    	$email = Input::get('email');
-    	$password = Input::get('password');
-
-    	if($success)
-    	{
-        	$user = User::where('id', '=', $currentuserid)->first();
-    		
-    		// user is found
-        	$response["error"] = FALSE;
-        	$response["id"] = $user->id;
-        	$response["message"] = "Success in Posting Last Logged in.";
-        	$response["user"]["name"] = $user->name;
-        	$response["user"]["email"] = $user->email;
-        	$response["user"]["created_at"] = $user->created_at;
-        	echo json_encode($response);
-    	}
-    	else
-    	{
-    		$response["error"] = TRUE;
-        	$response["error_msg"] = "Login credentials are wrong. Please try again!";
-        	echo json_encode($response);
-    	}
+        return Input::all();
     }
+
     public function register()
     {
         return view('androidregister');
     }
-    public function store()
+    public function storeuser()
     {
-        return Input::all();
+        $user = new apiuser;
+        $user->name = Input::get('name');
+        $user->email =Input::get('email');
+        $user->password=Input::get('password');
+
+        $user->save();
+        return Redirect::to('/');
+    }
+
+    public function assetcode()
+    {
+        $assetcode = Input::get('ASSETCODE');
+
+        $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
+        $Ecode = $AssetDet->Ecode;
+
+        $MachineDet = Equipment::where('Ecode',$Ecode)->first();
+        $MachineName = $MachineDet->Name;
+        $Maintain = Maintainence::where('Ecode',$Ecode)->get();
+        
+        foreach($Maintain as $index => $maintain)
+        {
+            $MachineDesc[] = $maintain->Name;
+        }
+
+        $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."'";
+        $Details = DB::connection('mysql2')->select($query);
+
+        foreach($Maintain as $i => $maintain){
+            $desc = $MachineDesc[$i];
+            $Machvalue[] = $Details[0]->$desc;
+        }
     }
 }

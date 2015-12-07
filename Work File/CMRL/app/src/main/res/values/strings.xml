@@ -16,6 +16,7 @@
     <string name="btn_logout">LOGOUT</string>
     <string name="btn_qrcode">QRCODE</string>
     <string name="name">Fullname</string>
+    <string name="btn_pending">Pending</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_qr">QRActivity</string>
@@ -23,4 +24,5 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_pending">PendingActivity</string>
 </resources>

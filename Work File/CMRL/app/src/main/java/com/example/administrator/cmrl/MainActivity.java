@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtEmail;
     private Button btnLogout;
     private Button btnqrcode;
+    private Button btnPending;
     private ProgressDialog pdia;
 
     private SQLiteHandler db;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         txtEmail = (TextView) findViewById(R.id.email);
         btnLogout = (Button) findViewById(R.id.btnLogout);
         btnqrcode = (Button) findViewById(R.id.btnqrcode);
+        btnPending = (Button) findViewById(R.id.btnPending);
 
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
@@ -99,7 +101,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent qrintent = new Intent(MainActivity.this,QRActivity.class);
-                startActivityForResult(qrintent,0);
+                startActivityForResult(qrintent, 0);
+            }
+        });
+
+        btnPending.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //Create a new Intent for all the history of works to be done.
+                Intent pintent = new Intent(MainActivity.this,EquipmentActivity.class);
+                startActivityForResult(pintent,1);
             }
         });
 

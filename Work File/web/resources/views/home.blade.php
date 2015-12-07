@@ -18,6 +18,7 @@
 				<div class="panel-heading">Errors</div>
 				{!! Form::open(array('url' => '/errors', 'class' => 'form-horizontal'))!!}
 				<div class="panel-body form-group">
+					@if(isset($err))
 					@foreach ($err as $index => $errors) 
 					<ul>
 						@if ($errors->archive == 0)
@@ -27,6 +28,7 @@
 					</ul>
 					@endforeach
 						<input class="btn-info" type="submit" value="Remove">
+					@endif
 				</div>
 				{!! Form::close()!!}
 			</div>

@@ -42,6 +42,11 @@
             android:label="@string/title_activity_equipment"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".PendingActivity"
+            android:label="@string/title_activity_pending"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>
