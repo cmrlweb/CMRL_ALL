@@ -116,4 +116,26 @@ public class Pendingtasks extends SQLiteOpenHelper {
 
         return task;
     }
+
+    public HashMap<String, String> getalltasks()
+    {
+        HashMap<String, String> task= new HashMap<String, String>();
+        String selectQuery = "SELECT  * FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() >0)
+        {
+            task.put("ASSETCODE",cursor.getString(1));
+            task.put("MESSAGE",cursor.getString(2));
+            task.put("INTERNET",cursor.getString(3));
+            task.put("SMS",cursor.getString(4));
+        }
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "Fetching Tasks from Sqlite: " + task.toString());
+
+        return task;
+    }
 }

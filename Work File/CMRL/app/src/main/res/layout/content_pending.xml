@@ -11,6 +11,22 @@
     tools:showIn="@layout/activity_pending"
     tools:context="com.example.administrator.cmrl.PendingActivity">
 
+    <LinearLayout
+        android:id="@+id/llpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+    </LinearLayout>
+    <Button
+        android:id="@+id/btngoback"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:background="@color/btn_logut_bg"
+        android:text="@string/goback"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="15dp" />
 
 </LinearLayout>

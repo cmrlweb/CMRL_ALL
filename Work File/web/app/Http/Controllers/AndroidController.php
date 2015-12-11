@@ -16,7 +16,10 @@ class AndroidController extends Controller
 {
     public function login()
     {
-        return Input::all();
+        
+        $response["assetcode"] = Input::get('ASSETCODE');
+
+        return json_encode($response);
     }
 
     public function register()

@@ -119,48 +119,9 @@ public class EquipmentActivity extends AppCompatActivity {
                 Log.d(TAG, "AssetCode Response: " + response);
 
                 try {
-                    JSONObject mainObj = new JSONObject(response);
-
-                    boolean error = mainObj.getBoolean("error");
-
-                    JSONArray MachineDesc =mainObj.getJSONArray("MachineDesc");
-
-                    JSONArray Value =mainObj.getJSONArray("Machvalue");
-
-                    if(!error)
-                    {
-
-                        for(int i=0;i < MachineDesc.length(); i++)
-                        {
-                            String Machinefunc = MachineDesc.getJSONObject(i).getString("name");
-                            Machine[i].setText(Machinefunc);
-
-                            if(Value.getJSONObject(i).getInt("name") != 0)
-                            {
-                                Machine[i].isChecked();
-                            }
-                        }
-
-                        //Sending SMS to all the people specified.
-                        try{
-
-                            SmsManager smsManager = SmsManager.getDefault();
-                            smsManager.sendTextMessage("9445868313",null,"Changes Made to "+ ASSETCODE + " Timestamp - " + nowTime +".",null,null);
-                            Toast.makeText(EquipmentActivity.this, "SMS Sent!",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        catch(Exception e)
-                        {
-                            Toast.makeText(EquipmentActivity.this, "Problem with sending SMS", Toast.LENGTH_SHORT).show();
-                            Log.v(TAG,"Error in sending message in SMS.");
-                        }
-                    }
-                    else
-                    {
-                        String errorMsg = mainObj.getString("error_msg");
-                        Toast.makeText(getApplicationContext(),
-                                errorMsg, Toast.LENGTH_LONG).show();
-                    }
+                    JSONObject someobj = new JSONObject(response);
+                    String assetcode = someobj.getString("assetcode");
+                    Toast.makeText(EquipmentActivity.this,assetcode, Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.v(TAG, "Error in Json Object");
