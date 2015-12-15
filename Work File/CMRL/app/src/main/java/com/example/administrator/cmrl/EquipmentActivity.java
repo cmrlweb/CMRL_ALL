@@ -2,10 +2,16 @@ package com.example.administrator.cmrl;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+
 
 import android.support.design.widget.TabLayout;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Iterator;
 import android.support.v4.view.ViewPager;
@@ -27,9 +33,11 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.administrator.cmrl.app.AppConfig;
 import com.example.administrator.cmrl.app.AppController;
+import com.example.administrator.cmrl.SendSMS;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,14 +52,12 @@ public class EquipmentActivity extends AppCompatActivity {
 
     private static final String TAG = EquipmentActivity.class.getSimpleName();
     private TextView AssetCode;
-    private TextView AssetName;
     private Button proceed;
     private Button goback;
     private String ASSETCODE;
     private LinearLayout IL;
     private String nowTime;
-    private String keyJSON[];
-    private String valJSON[];
+    private List<CheckBox> CheckBoxList = new ArrayList<CheckBox>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +68,44 @@ public class EquipmentActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             ASSETCODE = extras.getString("ASSET_CODE");
-            getAssetDetails(ASSETCODE);
             Log.v(TAG,ASSETCODE);
         }
 
-
         //Going Further with Proceed
         proceed = (Button) findViewById(R.id.btnproceed);
+        proceed.setVisibility(View.VISIBLE);
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(EquipmentActivity.this, "Hence Going Further", Toast.LENGTH_SHORT).show();
+                String ButtonText = proceed.getText().toString();
+                if(ButtonText.equals("Fetch Data")){
+                    if(isNetworkAvailable()) {
+                        Toast.makeText(EquipmentActivity.this, "Fetching CheckBoxes.", Toast.LENGTH_SHORT).show();
+                        getAssetDetails(ASSETCODE);
+                        proceed.setText("Save Data");
+                    }
+                    else
+                    {
+                        Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    if(isNetworkAvailable()) {
+                        sendAssetDetails(ASSETCODE);
+                        SendSMS smser = new SendSMS(ASSETCODE);
+                        //smser.send("8144087395");
+                    }
+                    else
+                    {
+                        Intent intent = new Intent(EquipmentActivity.this,PendingActivity.class);
+                        intent.putExtra("ASSETCODE",ASSETCODE);
+                        intent.putExtra("CheckBoxList", (Serializable) CheckBoxList);
+                        startActivityForResult(intent,3);
+                    }
+                    proceed.setVisibility(View.GONE);
+                    proceed.setText("Fetch Data");
+                }
+
             }
         });
 
@@ -87,6 +120,13 @@ public class EquipmentActivity extends AppCompatActivity {
 
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     private void getAssetDetails(final String ASSETCODE)
     {
 
@@ -98,18 +138,8 @@ public class EquipmentActivity extends AppCompatActivity {
                 timePresent.get(Calendar.MINUTE);
 
         String asset_req = "Asset_Request";
-        IL = (LinearLayout) findViewById(R.id.llInner);
+        IL = (LinearLayout) findViewById(R.id.llFinner);
         AssetCode = (TextView) findViewById(R.id.tvAssetCode);
-        AssetName = (TextView) findViewById(R.id.tvAssetName);
-        Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
-        final CheckBox[] Machine = new CheckBox[20];
-
-        for(int i=1;i<=8;i++) {
-            int resID = getResources().getIdentifier("checkBox" + i, "id", getPackageName());
-            Machine[i-1] = (CheckBox)findViewById(resID);
-
-        }
 
         StringRequest req = new StringRequest(Request.Method.POST,
                 AppConfig.URL_ASSETCODE,new Response.Listener<String>() {
@@ -119,9 +149,33 @@ public class EquipmentActivity extends AppCompatActivity {
                 Log.d(TAG, "AssetCode Response: " + response);
 
                 try {
-                    JSONObject someobj = new JSONObject(response);
-                    String assetcode = someobj.getString("assetcode");
-                    Toast.makeText(EquipmentActivity.this,assetcode, Toast.LENGTH_SHORT).show();
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+                    JSONArray MachineDesc =jObj.getJSONArray("MachineDesc");
+                    JSONArray Value =jObj.getJSONArray("Machvalue");
+
+                    // Check for error node in json
+                    if (!error) {
+                        for(int i=0;i < MachineDesc.length(); i++)
+                        {
+                            CheckBox cb = new CheckBox(getApplicationContext());
+                            String Machinefunc = MachineDesc.getJSONObject(i).getString("name");
+                            cb.setText(Machinefunc);
+                            Log.v(TAG, Machinefunc);
+
+                            if(Value.getJSONObject(i).getInt("name") != 0)
+                            {
+                                cb.isChecked();
+                            }
+                            cb.setTextColor(Color.BLACK);
+                            IL.addView(cb);
+                            CheckBoxList.add(cb);
+                        }
+                        AssetCode.setText(ASSETCODE);
+                    }
+                    else{
+                        Toast.makeText(EquipmentActivity.this, "Response was bad.", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.v(TAG, "Error in Json Object");
@@ -151,31 +205,72 @@ public class EquipmentActivity extends AppCompatActivity {
         AppController.getInstance().addToRequestQueue(req, asset_req);
     }
 
+    private void sendAssetDetails(final String ASSETCODE)
+    {
+        //Extract 0 or 1 for the CheckBox First.
+        final int Chsize = CheckBoxList.size();
+        final int CheckBoxValue[]= new int[Chsize];
+        for(int i=0;i<Chsize;i++)
+        {
+            CheckBox cb = new CheckBox(getApplicationContext());
+            cb = CheckBoxList.get(i);
+            if(cb.isChecked())
+                CheckBoxValue[i]=0;
+            else
+                CheckBoxValue[i]=1;
+        }
+
+        //Send the values along with assetcode to the URL
+        String send_asset = "Send Asset";
+        StringRequest req = new StringRequest(Request.Method.POST,
+                AppConfig.URL_POSTASSET,new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "AssetCode Response: " + response);
+
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+                    // Check for error node in json
+                    if (!error) {
+                    }
+                    else{
+                        Toast.makeText(EquipmentActivity.this, "Response was bad.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.v(TAG, "Error in Json Object");
+                }
+            }
+
+        },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "AssetDetails Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(),
+                        error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<>();
+                params.put("ASSETCODE", ASSETCODE);
+                params.put("Size",String.valueOf(Chsize));
+                for(int i=0;i<Chsize;i++)
+                {
+                    params.put("CheckBox_"+i, String.valueOf(CheckBoxValue[i]));
+                }
+                return params;
+            }
+
+        };
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(req, send_asset);
+    }
+
 }
-
-
-/*
-                        int rows=0;
-
-                        //Getting Array of values from JSON OBJECT.
-                        Iterator<String> iter = mainObj.keys();
-                        while (iter.hasNext()) {
-
-                            String key = iter.next();
-                            keyJSON[rows] = key;
-
-                            try {
-                                Object value = mainObj.get(key);
-                                valJSON[rows] = value.toString();
-                                //Storing the values for specific Keys.
-
-                            } catch (JSONException e) {
-                                // Something went wrong!
-                                Log.v(TAG,"KEY JSON OR VAL JSON Problem.");
-                            }
-                        }
-
-
-                        AssetCode.setText(valJSON[2]);
-                        AssetName.setText(valJSON[3]);
- */

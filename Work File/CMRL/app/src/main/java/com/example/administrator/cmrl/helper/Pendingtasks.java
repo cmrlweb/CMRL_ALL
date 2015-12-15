@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Pendingtasks extends SQLiteOpenHelper {
@@ -28,7 +29,9 @@ public class Pendingtasks extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_INTERNET = "internet";
     private static final String KEY_SMS = "smssent";
-
+    private static final String KEY_CBOX = "checkbox";
+    private static Pendingtasks instance;
+    private ArrayList<String> ALLAC;
 
     public Pendingtasks(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,9 +43,17 @@ public class Pendingtasks extends SQLiteOpenHelper {
         String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ASSETCODE + " TEXT UNIQUE,"
                 + KEY_MESSAGE + " TEXT," + KEY_INTERNET + " INTEGER,"
-                + KEY_SMS + " INTEGER" + ")";
+                + KEY_SMS + " INTEGER" + KEY_CBOX + "TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
         Log.d(TAG, "Database tables created");
+    }
+
+    public static synchronized Pendingtasks getHelper(Context context)
+    {
+        if (instance == null)
+            instance = new Pendingtasks(context);
+
+        return instance;
     }
 
     // Upgrading database
@@ -55,7 +66,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addtasks(String assetcode,String message,int internet,int sms)
+    public boolean addtasks(String assetcode,String message,int internet,int sms,String cbox)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -64,6 +75,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE,message);
         values.put(KEY_INTERNET,internet);
         values.put(KEY_SMS,sms);
+        values.put(KEY_CBOX,cbox);
 
         long id = db.insert(TABLE_USER, null, values);
         db.close();
@@ -104,10 +116,11 @@ public class Pendingtasks extends SQLiteOpenHelper {
         cursor.moveToFirst();
         if(cursor.getCount() >0)
         {
-            task.put("ASSETCODE",cursor.getString(1));
-            task.put("MESSAGE",cursor.getString(2));
-            task.put("INTERNET",cursor.getString(3));
-            task.put("SMS",cursor.getString(4));
+            task.put("ASSETCODE",cursor.getString(cursor.getColumnIndex(KEY_ASSETCODE)));
+            task.put("MESSAGE",cursor.getString(cursor.getColumnIndex(KEY_MESSAGE)));
+            task.put("INTERNET",cursor.getString(cursor.getColumnIndex(KEY_INTERNET)));
+            task.put("SMS",cursor.getString(cursor.getColumnIndex(KEY_SMS)));
+            task.put("CBOX",cursor.getString(cursor.getColumnIndex(KEY_CBOX)));
         }
         cursor.close();
         db.close();
@@ -117,25 +130,35 @@ public class Pendingtasks extends SQLiteOpenHelper {
         return task;
     }
 
-    public HashMap<String, String> getalltasks()
+    public ArrayList<String> getalltasks()
     {
-        HashMap<String, String> task= new HashMap<String, String>();
-        String selectQuery = "SELECT  * FROM " + TABLE_USER;
+        ALLAC = new ArrayList<String>();
+        ALLAC.clear();
+        String selectQuery = "SELECT * FROM " + TABLE_USER;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         cursor.moveToFirst();
         if(cursor.getCount() >0)
         {
-            task.put("ASSETCODE",cursor.getString(1));
-            task.put("MESSAGE",cursor.getString(2));
-            task.put("INTERNET",cursor.getString(3));
-            task.put("SMS",cursor.getString(4));
+            while(cursor.isAfterLast() == false)
+            {
+                String assetcode = cursor.getString(cursor.getColumnIndex(KEY_ASSETCODE));
+                ALLAC.add(assetcode);
+
+            }
         }
         cursor.close();
         db.close();
 
-        Log.d(TAG, "Fetching Tasks from Sqlite: " + task.toString());
+        Log.d(TAG, "Fetching com.example.administrator.cmrl.Tasks from Sqlite: ");
+        return ALLAC;
+    }
 
-        return task;
+    public void updatetasks(String assetcode,int internet,int sms)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE "+TABLE_USER+" SET internet = "+internet+", smssent = "+sms+" WHERE assetcode = "+ assetcode;
+        db.execSQL(strSQL);
+        db.close();
     }
 }

@@ -140,16 +140,11 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
 
                         // Now store the user in SQLite
                         String uid = jObj.getString("id");
-                        String message = jObj.getString("message");
-                        Log.v(TAG,message);
-                        JSONObject user = jObj.getJSONObject("user");
-                        String name = user.getString("name");
-                        String email = user.getString("email");
-                        String created_at = user
-                                .getString("created_at");
+                        String name = jObj.getString("name");
+                        String email = jObj.getString("email");
 
                         // Inserting row in users table
-                        db.addUser(name, email, uid, created_at);
+                        db.addUser(name, email, uid);
 
                         // Launch main activity
                         Intent intent = new Intent(LoginActivity.this,
@@ -179,6 +174,10 @@ public class LoginActivity extends AppCompatActivity {private static final Strin
                 hideDialog();
             }
         }) {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded; charset=UTF-8";}
 
             @Override
             protected Map<String, String> getParams() {

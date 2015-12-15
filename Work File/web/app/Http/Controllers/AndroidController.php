@@ -7,6 +7,10 @@ use Input;
 use Hash;
 use Illuminate\Support\Facades\Redirect;
 use CMRL\User;
+use CMRL\AssetCodes;
+use DB;
+use CMRL\Equipment;
+use CMRL\Maintainence;
 use CMRL\apiuser;
 use Auth;
 use CMRL\Http\Requests;
@@ -16,9 +20,26 @@ class AndroidController extends Controller
 {
     public function login()
     {
-        
-        $response["assetcode"] = Input::get('ASSETCODE');
+        $email = Input::get('email');
+        $user = apiuser::where('email',$email)->first();
 
+        $pass = $user->password;
+
+        $password = Input::get('password');
+
+        if($pass == $password)
+        {    
+            $response["error"] = "false";
+            $response["id"] = $user->id;
+            $response["name"] = $user->name;
+            $response["email"] = $user->email;
+            $responser["created_at"] = $user->created_at;
+        }
+        else
+        {
+            $response["error"] = "true";
+            $response["error_msg"] = "Login Credentials were wrong";
+        }
         return json_encode($response);
     }
 
@@ -28,13 +49,7 @@ class AndroidController extends Controller
     }
     public function storeuser()
     {
-        $user = new apiuser;
-        $user->name = Input::get('name');
-        $user->email =Input::get('email');
-        $user->password=Input::get('password');
-
-        $user->save();
-        return Redirect::to('/');
+        return Input::all();
     }
 
     public function assetcode()
@@ -51,14 +66,105 @@ class AndroidController extends Controller
         foreach($Maintain as $index => $maintain)
         {
             $MachineDesc[] = $maintain->Name;
+            $MachineDesc1[$index] = $maintain->Name;
         }
 
         $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."'";
-        $Details = DB::connection('mysql2')->select($query);
+        $Details = DB::connection('mysql')->select($query);
+
+        foreach($Maintain as $i => $maintain){
+            $desc = $MachineDesc[$i];
+            $Machvalue[] = $Details[0]->$desc;
+            $Machvalue1[$i] = $Details[0]->$desc;
+        }
+        if(isset($assetcode))
+        {
+            $response["error"] = "false";
+            foreach($Maintain as $index => $maintain)
+            {
+                $response["MachineDesc"][$index]["name"] = $MachineDesc1[$index];
+            }
+            foreach($Maintain as $index => $maintain){
+                $response["Machvalue"][$index]["name"] = $Machvalue1[$index];
+            }
+        }
+        else
+            $response["error"] = "true";
+        return json_encode($response);
+    }
+
+    public function postdata()
+    {
+        $assetcode = Input::get('ASSETCODE');
+        $checkboxsize = Input::get('Size');
+
+        for($i=0;$i<$checkboxsize;$i++)
+        {
+            $value = "CheckBox_".$i;
+            $MachCBValue[$i]=Input::get($value);
+        }
+        //Assetcode and its Retreival
+        $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
+        $Ecode = $AssetDet->Ecode;
+
+        $MachineDet = Equipment::where('Ecode',$Ecode)->first();
+        $MachineName = $MachineDet->Name;
+        $Maintain = Maintainence::where('Ecode',$Ecode)->get();
+        
+        foreach($Maintain as $index => $maintain)
+        {
+            $MachineDesc[] = $maintain->Name;
+            $Machinetimer[] = $maintain->timer;
+        }
+
+        $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."'";
+        $Details = DB::connection('mysql')->select($query);
 
         foreach($Maintain as $i => $maintain){
             $desc = $MachineDesc[$i];
             $Machvalue[] = $Details[0]->$desc;
         }
+        
+        //UNDERSTANDING this part is pretty hard
+        //The main this is that i am constructing an insert query to be executed
+        //Since everything is dynamic .First thing im creating is
+        //INSERT INTO TABLENAME () , What comes inside that Brackets. and inside VALUES();
+        //I use implode function to actually do this process of converting an array into string.
+        $i=0;
+        $j=0;
+        while($j<count($MachineDesc))
+        {
+            $MachineValueforinsert[$i]=$MachCBValue[$j];
+            $MachineValueforinsert[$i+1]=$Machinetimer[$j];
+            //Values() will have the checkbox value and a timer . ex : 0,91,1,182 etc where 91 , 182 are timer days and 0,1
+            //all are checkbox value.
+            $i = $i + 2;
+            $j = $j + 1;
+        }
+
+        $i=0;
+        $j=0;
+        while($j<count($MachineDesc))
+        {
+            $MachineDescforinsert[$i]=$MachineDesc[$j];
+            $MachineDescforinsert[$i+1]=$MachineDesc[$j]."_d";
+            //Inside table_name () , There will be a list of items we need to insert , That is what being done in this area.
+            $i = $i + 2;
+            $j = $j + 1;
+        }
+
+        $INMachineValue = implode(",",$MachineValueforinsert);
+        $INMachineDescription = implode(",",$MachineDescforinsert);
+
+        //End of Fetch. Now. Insert a new data int the Fan
+        $query = "INSERT INTO ".$MachineName." (AssetCode,".$INMachineDescription.")"." VALUES("."'".$assetcode."'".",".$INMachineValue.")";
+        
+        $Success = DB::connection('mysql')->insert($query,[]);
+
+        if($Success)
+            $response["error"]="false";
+        else
+            $response["error"]="true";
+        return json_encode($response);
     }
 }

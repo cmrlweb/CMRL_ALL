@@ -23,6 +23,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.administrator.cmrl.app.AppConfig;
 import com.example.administrator.cmrl.app.AppController;
+import com.example.administrator.cmrl.helper.Pendingtasks;
 import com.example.administrator.cmrl.helper.SQLiteHandler;
 import com.example.administrator.cmrl.helper.SessionManager;
 
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnqrcode;
     private Button btnPending;
     private ProgressDialog pdia;
+    private Pendingtasks tasksdb = Pendingtasks.getHelper(this);
 
     private SQLiteHandler db;
     private SessionManager session;
