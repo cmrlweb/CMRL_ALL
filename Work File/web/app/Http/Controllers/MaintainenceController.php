@@ -41,8 +41,7 @@ class MaintainenceController extends Controller
         $main->Ecode = Input::get('selector');
         $main->Name = Input::get('mnname');
         $main->timer = Input::get('timer');
-
-        // $main->save();
+        $main->save();
 
         return Redirect::to('/');
     }

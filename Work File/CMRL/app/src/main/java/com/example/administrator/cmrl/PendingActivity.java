@@ -24,6 +24,7 @@ import android.widget.TableRow;
 import android.widget.Toast;
 
 import com.example.administrator.cmrl.helper.Pendingtasks;
+import com.example.administrator.cmrl.helper.SQLiteHandler;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -37,12 +38,11 @@ public class PendingActivity extends AppCompatActivity {
     private List<Button> ButtonList = new ArrayList<Button>();
     private Button gback;
     private String ASSETCODE;
-    private ProgressDialog pDialog;
-    private List<CheckBox> CheckBoxList = new ArrayList<CheckBox>();
-    private Pendingtasks tasksdb = Pendingtasks.getHelper(this);
+    private String CheckBoxValues;
+    private SQLiteHandler db;
     private int taskdbsize;
-    private List<String> ALLAC;
-    private JobScheduler mJobScheduler;
+    private TableLayout tlinner;
+    private List<Tasks> alltasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,26 +50,38 @@ public class PendingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pending);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Progress dialog
-        pDialog = new ProgressDialog(this);
-        pDialog.setCancelable(false);
+
+        //Initializing DB
+        db = new SQLiteHandler(getApplicationContext());
+        taskdbsize = db.gettaskrows();
+
+        //Creating a table layout
+        tlinner = (TableLayout) findViewById(R.id.tlinner);
+        tlinner.setStretchAllColumns(true);
+
+        //Get all Tasks and add it in the table
+        alltasks = db.getallTasks();
+        for(int i=0;i<taskdbsize;i++)
+        {
+            Tasks singletask;
+            singletask = alltasks.get(i);
+            tlinner.addView(createOneFullRow(i,singletask.getAssetcode()));
+        }
+        //End of Creating Table Layout.
+
 
         //Getting Values from Old Intent if we get it by any chance then.
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            pDialog.setMessage("Adding Pending Task.");
-            showDialog();
-            ASSETCODE = extras.getString("ASSET_CODE");
-            CheckBoxList = (ArrayList<CheckBox>) getIntent().getSerializableExtra("CheckBoxList");
+            ASSETCODE = extras.getString("ASSETCODE");
+            CheckBoxValues = extras.getString("CheckBoxValues");
+            Log.v(TAG,CheckBoxValues);
             Log.v(TAG, ASSETCODE);
-            //Creating an SQL Table.
-            createtask(ASSETCODE, CheckBoxList);
+            createtask(ASSETCODE,CheckBoxValues);
         }
 
         //onclick listeners for goback button
         gback = (Button) findViewById(R.id.btngoback);
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.llpinner);
-        linearLayout.addView(tableLayout());
         gback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,36 +96,31 @@ public class PendingActivity extends AppCompatActivity {
             ButtonList.get(i).setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
-                    ALLAC = tasksdb.getalltasks();
-                    String assetcodecheck = ALLAC.get(finalI);
+                    Tasks singletask = alltasks.get(finalI);
+
                     //Sending assetcode to a new intent having the Option to check whether its sent.
                     Intent check = new Intent(PendingActivity.this,CheckTaskActivity.class);
-                    check.putExtra("ASSETCODE",assetcodecheck);
-                    check.putExtra("ACVAL",finalI);
-                    ALLAC.clear();
-                    startActivityForResult(check,4);
+                    check.putExtra("ASSETCODE",singletask.getAssetcode());
+                    startActivityForResult(check,5);
                 }
             });
         }
     }
 
-    private TableLayout tableLayout() {
-        TableLayout tableLayout = new TableLayout(this);
-        tableLayout.setStretchAllColumns(true);
-        taskdbsize = tasksdb.getrows();
-        ALLAC = tasksdb.getalltasks();
-        for(int i=0;i<taskdbsize;i++)
-        {
-            String CAC = ALLAC.get(i);
-            tableLayout.addView(createOneFullRow(i,CAC));
-        }
-        ALLAC.clear();
-        return tableLayout;
+    private void createtask(String ASSETCODE, String checkBoxValues) {
+        Tasks singletask = new Tasks();
+        singletask.setAssetcode(ASSETCODE);
+        singletask.setMessage("Base Internet Failed");
+        singletask.setINTERNET(0);
+        singletask.setSMS(0);
+        singletask.setCheckBox(checkBoxValues);
+        singletask.setChsize(checkBoxValues.length());
+        db.addtasks(singletask);
     }
 
     private TableRow createOneFullRow(int rowid,String assetcode) {
         TableRow tableRow = new TableRow(this);
-        tableRow.setPadding(0, 10, 0, 0);
+        //tableRow.setPadding(0, 10, 0, 0);
         Button Checkbutton = new Button(this);
         Checkbutton.setText("Check");
         tableRow.addView(editText(rowid, assetcode));
@@ -128,51 +135,5 @@ public class PendingActivity extends AppCompatActivity {
         editText.setHint(assetcode);
         editTextList.add(editText);
         return editText;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void createtask(String ASSETCODE,List<CheckBox> CheckBoxList)
-    {
-        String Message ="Base Internet Failed.";
-        String CheckBoxValues= new String();
-        Character[] CheckBoxArray = new Character[100];
-        //Seperate Checbox Values and convert it into a string.
-        for(int i=0;i<CheckBoxList.size();i++)
-        {
-            CheckBox cb = new CheckBox(this);
-            cb = (CheckBox) CheckBoxList.get(i);
-
-            if(cb.isChecked())
-                CheckBoxArray[i]='1';
-
-            else
-                CheckBoxArray[i]='0';
-        }
-
-        boolean taskcreated = tasksdb.addtasks(ASSETCODE,Message,0,0);
-
-        //Creating a Job Here itself.
-        mJobScheduler = (JobScheduler) getSystemService( Context.JOB_SCHEDULER_SERVICE );
-        JobInfo.Builder builder = new JobInfo.Builder( 1,new ComponentName( getPackageName(),JobSchedule.class.getName() ) );
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        builder.setPeriodic(2000);
-        builder.setMinimumLatency(100);
-        if( mJobScheduler.schedule( builder.build() ) <= 0 ) {
-            Toast.makeText(PendingActivity.this, "Problem With adding Job Scheduler . Fix it Manually.", Toast.LENGTH_SHORT).show();
-        }
-
-
-        hideDialog();
-        finish();
-    }
-
-    private void showDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
-    }
-
-    private void hideDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
     }
 }

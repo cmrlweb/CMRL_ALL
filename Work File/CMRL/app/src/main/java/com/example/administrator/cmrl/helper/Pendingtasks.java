@@ -29,6 +29,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_INTERNET = "internet";
     private static final String KEY_SMS = "smssent";
+    private static final String KEY_CSIZE = "chsize";
     private static final String KEY_CBOX = "checkbox";
     private static Pendingtasks instance;
     private ArrayList<String> ALLAC;
@@ -41,9 +42,9 @@ public class Pendingtasks extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ASSETCODE + " TEXT UNIQUE,"
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_ASSETCODE + " TEXT UNIQUE,"
                 + KEY_MESSAGE + " TEXT," + KEY_INTERNET + " INTEGER,"
-                + KEY_SMS + " INTEGER" + KEY_CBOX + "TEXT" + ")";
+                + KEY_SMS + " INTEGER," + KEY_CSIZE + " INTEGER," +KEY_CBOX + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
         Log.d(TAG, "Database tables created");
     }
@@ -66,7 +67,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addtasks(String assetcode,String message,int internet,int sms,String cbox)
+    public boolean addtasks(String assetcode,String message,int internet,int sms,int size,String cbox)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -75,6 +76,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE,message);
         values.put(KEY_INTERNET,internet);
         values.put(KEY_SMS,sms);
+        values.put(KEY_CSIZE,size);
         values.put(KEY_CBOX,cbox);
 
         long id = db.insert(TABLE_USER, null, values);
@@ -82,7 +84,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
 
         Log.d(TAG, "New Task into SQLITE with id : " + id);
 
-        return Boolean.parseBoolean(null);
+        return false;
     }
 
     public int deletetasks(String assetcode)
@@ -120,6 +122,7 @@ public class Pendingtasks extends SQLiteOpenHelper {
             task.put("MESSAGE",cursor.getString(cursor.getColumnIndex(KEY_MESSAGE)));
             task.put("INTERNET",cursor.getString(cursor.getColumnIndex(KEY_INTERNET)));
             task.put("SMS",cursor.getString(cursor.getColumnIndex(KEY_SMS)));
+            task.put("CSIZE",cursor.getString(cursor.getColumnIndex(KEY_CSIZE)));
             task.put("CBOX",cursor.getString(cursor.getColumnIndex(KEY_CBOX)));
         }
         cursor.close();
@@ -144,7 +147,6 @@ public class Pendingtasks extends SQLiteOpenHelper {
             {
                 String assetcode = cursor.getString(cursor.getColumnIndex(KEY_ASSETCODE));
                 ALLAC.add(assetcode);
-
             }
         }
         cursor.close();

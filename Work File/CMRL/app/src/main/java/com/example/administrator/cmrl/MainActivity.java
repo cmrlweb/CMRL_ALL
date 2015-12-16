@@ -54,9 +54,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogout;
     private Button btnqrcode;
     private Button btnPending;
-    private ProgressDialog pdia;
-    private Pendingtasks tasksdb = Pendingtasks.getHelper(this);
-
     private SQLiteHandler db;
     private SessionManager session;
 
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Create a new Intent for all the history of works to be done.
-                Intent pintent = new Intent(MainActivity.this,EquipmentActivity.class);
+                Intent pintent = new Intent(MainActivity.this,PendingActivity.class);
                 startActivityForResult(pintent,1);
             }
         });
@@ -138,26 +135,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    private void showDialog() {
-        if (!pdia.isShowing())
-            pdia.show();
-    }
-
-    private void hideDialog(){
-        if (pdia.isShowing()) {
-            try
-            {
-                Thread.sleep(100);
-                pdia.dismiss();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-
-        }
-
     }
 }

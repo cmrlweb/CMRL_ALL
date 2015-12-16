@@ -49,7 +49,12 @@ class AndroidController extends Controller
     }
     public function storeuser()
     {
-        return Input::all();
+        $user = new apiuser;
+        $user->name = Input::get("name");
+        $user->email = Input::get("email");
+        $user->password = Input::get("password");
+        $user->save();
+       return Redirect::to('/');
     }
 
     public function assetcode()
@@ -69,7 +74,7 @@ class AndroidController extends Controller
             $MachineDesc1[$index] = $maintain->Name;
         }
 
-        $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."'";
+        $query = "SELECT * FROM ".$MachineName." WHERE AssetCode ='".$assetcode."' ORDER BY id DESC";
         $Details = DB::connection('mysql')->select($query);
 
         foreach($Maintain as $i => $maintain){

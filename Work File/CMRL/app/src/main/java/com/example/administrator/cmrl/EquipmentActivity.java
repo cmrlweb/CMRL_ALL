@@ -57,66 +57,84 @@ public class EquipmentActivity extends AppCompatActivity {
     private String ASSETCODE;
     private LinearLayout IL;
     private String nowTime;
+    private String CheckBoxValues;
     private List<CheckBox> CheckBoxList = new ArrayList<CheckBox>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_equipment);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_equipment);
 
-        //Getting Values from Old Intent
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            ASSETCODE = extras.getString("ASSET_CODE");
-            Log.v(TAG,ASSETCODE);
-        }
 
-        //Going Further with Proceed
-        proceed = (Button) findViewById(R.id.btnproceed);
-        proceed.setVisibility(View.VISIBLE);
-        proceed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String ButtonText = proceed.getText().toString();
-                if(ButtonText.equals("Fetch Data")){
-                    if(isNetworkAvailable()) {
-                        Toast.makeText(EquipmentActivity.this, "Fetching CheckBoxes.", Toast.LENGTH_SHORT).show();
-                        getAssetDetails(ASSETCODE);
-                        proceed.setText("Save Data");
-                    }
-                    else
-                    {
-                        Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else{
-                    if(isNetworkAvailable()) {
-                        sendAssetDetails(ASSETCODE);
-                        SendSMS smser = new SendSMS(ASSETCODE);
-                        //smser.send("8144087395");
-                    }
-                    else
-                    {
-                        Intent intent = new Intent(EquipmentActivity.this,PendingActivity.class);
-                        intent.putExtra("ASSETCODE",ASSETCODE);
-                        intent.putExtra("CheckBoxList", (Serializable) CheckBoxList);
-                        startActivityForResult(intent,3);
-                    }
-                    proceed.setVisibility(View.GONE);
-                    proceed.setText("Fetch Data");
-                }
-
+            //Getting Values from Old Intent
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                ASSETCODE = extras.getString("ASSET_CODE");
+                Log.v(TAG,ASSETCODE);
             }
-        });
 
-        //Returning Back to previous Intent
-        goback = (Button) findViewById(R.id.btngoback);
-        goback.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+            //If Internet is not there
+            final Intent jintent = new Intent(EquipmentActivity.this,PendingActivity.class);
+
+            //Going Further with Proceed
+            proceed = (Button) findViewById(R.id.btnproceed);
+            proceed.setVisibility(View.VISIBLE);
+            proceed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String ButtonText = proceed.getText().toString();
+                    if(ButtonText.equals("Fetch Data")){
+                        if(isNetworkAvailable()) {
+                            Toast.makeText(EquipmentActivity.this, "Fetching CheckBoxes.", Toast.LENGTH_SHORT).show();
+                            getAssetDetails(ASSETCODE);
+                            proceed.setText("Save Data");
+                        }
+                        else
+                        {
+                            Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else{
+                        if(isNetworkAvailable()) {
+                            sendAssetDetails(ASSETCODE);
+                            SendSMS smser = new SendSMS(ASSETCODE);
+                            //smser.send("8144087395");
+                        }
+                        else
+                        {
+                            final int Chsize = CheckBoxList.size();
+                            Log.v(TAG,String.valueOf(Chsize));
+                            for(int i=0;i<Chsize;i++) {
+                                CheckBox cb = new CheckBox(getApplicationContext());
+                                cb = CheckBoxList.get(i);
+                                if (cb.isChecked()) {
+                                    CheckBoxValues += "1";
+                                } else {
+                                    CheckBoxValues += "0";
+                                }
+                            }
+
+                            Log.v(TAG,CheckBoxValues);
+
+                            jintent.putExtra("ASSETCODE",ASSETCODE);
+                            jintent.putExtra("CheckBoxValues", CheckBoxValues);
+                            startActivityForResult(jintent,4);
+                        }
+                        proceed.setVisibility(View.GONE);
+                        proceed.setText("Fetch Data");
+                    }
+
+                }
+            });
+
+            //Returning Back to previous Intent
+            goback = (Button) findViewById(R.id.btngoback);
+            goback.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
 
     }
 
@@ -165,7 +183,7 @@ public class EquipmentActivity extends AppCompatActivity {
 
                             if(Value.getJSONObject(i).getInt("name") != 0)
                             {
-                                cb.isChecked();
+                                cb.setChecked(true);
                             }
                             cb.setTextColor(Color.BLACK);
                             IL.addView(cb);
@@ -210,16 +228,17 @@ public class EquipmentActivity extends AppCompatActivity {
         //Extract 0 or 1 for the CheckBox First.
         final int Chsize = CheckBoxList.size();
         final int CheckBoxValue[]= new int[Chsize];
-        for(int i=0;i<Chsize;i++)
-        {
+        for(int i=0;i<Chsize;i++) {
             CheckBox cb = new CheckBox(getApplicationContext());
             cb = CheckBoxList.get(i);
-            if(cb.isChecked())
-                CheckBoxValue[i]=0;
-            else
-                CheckBoxValue[i]=1;
+            if (cb.isChecked()) {
+                CheckBoxValue[i] = 0;
+                CheckBoxValues += "1";
+            } else {
+                CheckBoxValue[i] = 1;
+                CheckBoxValues += "0";
+            }
         }
-
         //Send the values along with assetcode to the URL
         String send_asset = "Send Asset";
         StringRequest req = new StringRequest(Request.Method.POST,

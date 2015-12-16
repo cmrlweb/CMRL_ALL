@@ -38,11 +38,49 @@ class AssetsController extends Controller
     {
     
         $acode = new AssetCodes;
-
         $acode->assetcode = Input::get('assetcode');
         $Eval = Input::get('selector');
         $acode->Ecode = $Eval;
- //       $acode->save();
+        $acode->save();
+
+        $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
+        $Ecode = $AssetDet->Ecode;
+        $MachineDet = Equipment::where('Ecode',$Ecode)->first();
+        $MachineName = $MachineDet->Name;
+        $Maintain = Maintainence::where('Ecode',$Ecode)->get();
+        
+        foreach($Maintain as $index => $maintain)
+        {
+            $MachineDesc[] = $maintain->Name;
+            $Machinetimer[] = $maintain->timer;
+        }
+
+        $i=0;
+        $j=0;
+        while($j<count($MachineDesc))
+        {
+            $MachineValueforinsert[$i]="0";
+            $MachineValueforinsert[$i+1]=$Machinetimer[$j];
+            //Values() will have the checkbox value and a timer . ex : 0,91,1,182 etc where 91 , 182 are timer days and 0,1
+            //all are checkbox value.
+            $i = $i + 2;
+            $j = $j + 1;
+        }
+        $i=0;
+        $j=0;
+        while($j<count($MachineDesc))
+        {
+            $MachineDescforinsert[$i]=$MachineDesc[$j];
+            $MachineDescforinsert[$i+1]=$MachineDesc[$j]."_d";
+            //Inside table_name () , There will be a list of items we need to insert , That is what being done in this area.
+            $i = $i + 2;
+            $j = $j + 1;
+        }
+        $INMachineValue = implode(",",$MachineValueforinsert);
+        $INMachineDescription = implode(",",$MachineDescforinsert);
+
+        $query = "INSERT INTO ".$MachineName." (AssetCode,".$INMachineDescription.")"." VALUES("."'".$assetcode."'".",".$INMachineValue.")";
+        $Details = DB::connection('mysql')->insert($query,[]);
  
         return Redirect::to('/');
     }
@@ -143,9 +181,6 @@ class AssetsController extends Controller
         $Equip = new Equipment;
         $Equip->Ecode = Input::get('Ecode');
         $Equip->Name = Input::get('Ename');
-        
-        // $Equip->save();
-
         return Redirect::to('/');
 
     }
