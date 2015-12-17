@@ -43,7 +43,7 @@ class AssetsController extends Controller
         $acode->Ecode = $Eval;
         $acode->save();
 
-        $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
+        $AssetDet = AssetCodes::where('assetcode',Input::get('assetcode'))->first();
         $Ecode = $AssetDet->Ecode;
         $MachineDet = Equipment::where('Ecode',$Ecode)->first();
         $MachineName = $MachineDet->Name;
@@ -79,7 +79,7 @@ class AssetsController extends Controller
         $INMachineValue = implode(",",$MachineValueforinsert);
         $INMachineDescription = implode(",",$MachineDescforinsert);
 
-        $query = "INSERT INTO ".$MachineName." (AssetCode,".$INMachineDescription.")"." VALUES("."'".$assetcode."'".",".$INMachineValue.")";
+        $query = "INSERT INTO ".$MachineName." (AssetCode,".$INMachineDescription.")"." VALUES("."'".Input::get('assetcode')."'".",".$INMachineValue.")";
         $Details = DB::connection('mysql')->insert($query,[]);
  
         return Redirect::to('/');

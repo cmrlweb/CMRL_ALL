@@ -37,8 +37,8 @@ public class CheckTaskActivity extends AppCompatActivity {
 
     private static final String TAG = EquipmentActivity.class.getSimpleName();
     private String ASSETCODE;
-    private String Checkboxvalue;
-    private int ACVAL;
+    private Button goback;
+    private String useremail;
     private TextView ACNAME;
     private TextView ACMessage;
     private Button ACInternet;
@@ -55,8 +55,19 @@ public class CheckTaskActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        goback = (Button) findViewById(R.id.btngoback);
+        goback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         //Initiallizing db
         db = new SQLiteHandler(getApplicationContext());
+        // Fetching user details from sqlite
+        HashMap<String, String> user = db.getUserDetails();
+        useremail = user.get("email");
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -126,6 +137,7 @@ public class CheckTaskActivity extends AppCompatActivity {
                 singletask.setINTERNET(chkinternet);
                 singletask.setSMS(chksms);
                 db.updatetask(singletask);
+                finish();
             }
         }
     }
@@ -183,6 +195,7 @@ public class CheckTaskActivity extends AppCompatActivity {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<>();
                 params.put("ASSETCODE", ASSETCODE);
+                params.put("email",useremail);
                 params.put("Size",String.valueOf(Chsize));
                 for(int i=0;i<Chsize;i++)
                 {

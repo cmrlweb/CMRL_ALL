@@ -60,6 +60,7 @@ class AndroidController extends Controller
     public function assetcode()
     {
         $assetcode = Input::get('ASSETCODE');
+        $emailid = Input::get('email');
 
         $AssetDet = AssetCodes::where('assetcode', $assetcode)->first();
         $Ecode = $AssetDet->Ecode;
@@ -95,12 +96,24 @@ class AndroidController extends Controller
         }
         else
             $response["error"] = "true";
+
+        $apiuser = apiuser::where('email',$emailid)->first();
+        $status = "QRFETCH";
+
+        $historyuser = new history;
+        $historyuser->assetcode = $assetcode;
+        $historyuser->username = $apiuser->name;
+        $historyuser->status = $status;
+
+        $historyuser->save();
+
         return json_encode($response);
     }
 
     public function postdata()
     {
         $assetcode = Input::get('ASSETCODE');
+        $emailid = Input::get('email');
         $checkboxsize = Input::get('Size');
 
         for($i=0;$i<$checkboxsize;$i++)
@@ -171,5 +184,16 @@ class AndroidController extends Controller
         else
             $response["error"]="true";
         return json_encode($response);
+
+
+        $apiuser = apiuser::where('email',$emailid)->first();
+        $status = "CHANGED";
+
+        $historyuser = new history;
+        $historyuser->assetcode = $assetcode;
+        $historyuser->username = $apiuser->name;
+        $historyuser->status = $status;
+
+        $historyuser->save();
     }
 }

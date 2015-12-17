@@ -38,6 +38,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.example.administrator.cmrl.app.AppConfig;
 import com.example.administrator.cmrl.app.AppController;
 import com.example.administrator.cmrl.SendSMS;
+import com.example.administrator.cmrl.helper.SQLiteHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,6 +56,8 @@ public class EquipmentActivity extends AppCompatActivity {
     private Button proceed;
     private Button goback;
     private String ASSETCODE;
+    private String useremail;
+    private SQLiteHandler db;
     private LinearLayout IL;
     private String nowTime;
     private String CheckBoxValues;
@@ -65,6 +68,11 @@ public class EquipmentActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_equipment);
 
+            db = new SQLiteHandler(getApplicationContext());
+
+            // Fetching user details from sqlite
+            HashMap<String, String> user = db.getUserDetails();
+            useremail = user.get("email");
 
             //Getting Values from Old Intent
             Bundle extras = getIntent().getExtras();
@@ -215,6 +223,7 @@ public class EquipmentActivity extends AppCompatActivity {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<>();
                 params.put("ASSETCODE", ASSETCODE);
+                params.put("email",useremail);
                 return params;
             }
 
@@ -278,6 +287,7 @@ public class EquipmentActivity extends AppCompatActivity {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<>();
                 params.put("ASSETCODE", ASSETCODE);
+                params.put("email",useremail);
                 params.put("Size",String.valueOf(Chsize));
                 for(int i=0;i<Chsize;i++)
                 {
