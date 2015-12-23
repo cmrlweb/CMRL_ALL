@@ -132,12 +132,13 @@ public class CheckTaskActivity extends AppCompatActivity {
             if(chkinternet == 1 && chksms ==1)
             {
                 int deletechk = db.deletetasks(ASSETCODE);
+                finish();
             }
             else {
                 singletask.setINTERNET(chkinternet);
                 singletask.setSMS(chksms);
                 db.updatetask(singletask);
-                finish();
+
             }
         }
     }

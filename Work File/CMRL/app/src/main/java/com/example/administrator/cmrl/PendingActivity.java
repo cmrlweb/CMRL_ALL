@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.cmrl.helper.Pendingtasks;
@@ -34,7 +35,7 @@ import java.util.List;
 public class PendingActivity extends AppCompatActivity {
 
     private static final String TAG = EquipmentActivity.class.getSimpleName();
-    private List<EditText> editTextList = new ArrayList<EditText>();
+    private List<TextView> TextViewList = new ArrayList<TextView>();
     private List<Button> ButtonList = new ArrayList<Button>();
     private Button gback;
     private String ASSETCODE;
@@ -129,11 +130,12 @@ public class PendingActivity extends AppCompatActivity {
         return tableRow;
     }
 
-    private EditText editText(int rowid,String assetcode) {
-        EditText editText = new EditText(this);
+    private TextView editText(int rowid,String assetcode) {
+        TextView editText = new TextView(this);
         editText.setId(Integer.valueOf(rowid));
-        editText.setHint(assetcode);
-        editTextList.add(editText);
+        editText.setText(assetcode);
+        editText.setMaxWidth(50);
+        TextViewList.add(editText);
         return editText;
     }
 }
