@@ -2,6 +2,7 @@ package com.example.administrator.cmrl;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Iterator;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -35,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.example.administrator.cmrl.Sync.SyncAdapter;
 import com.example.administrator.cmrl.app.AppConfig;
 import com.example.administrator.cmrl.app.AppController;
 import com.example.administrator.cmrl.SendSMS;
@@ -52,6 +55,7 @@ import java.util.Map;
 public class EquipmentActivity extends AppCompatActivity {
 
     private static final String TAG = EquipmentActivity.class.getSimpleName();
+    public SyncAdapter Syncer = new SyncAdapter(getApplicationContext(),true);
     private TextView AssetCode;
     private Button proceed;
     private Button goback;
@@ -98,7 +102,26 @@ public class EquipmentActivity extends AppCompatActivity {
                             proceed.setText("Save Data");
                         }
                         else
-                        {
+                        { /*
+                            CharSequence features[] = new CharSequence[] {"TVS_FAN","TVS_DAMPER"};
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(EquipmentActivity.this);
+                            alertDialog.setTitle("Options");
+                            alertDialog.setItems(features, new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // TODO Auto-generated method stub
+                                    if (which == 0) {
+                                        // handle "TVS_FAN" option
+                                    } else if (which == 1) {
+                                        // handle "TVS_DAMPER" option
+                                    }
+                                }
+                            });
+                            alertDialog.show();
+                            */
+                            Syncer.syncImmediately(getApplicationContext());
+
                             Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();
                         }
                     }

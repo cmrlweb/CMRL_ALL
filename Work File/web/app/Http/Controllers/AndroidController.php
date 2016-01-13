@@ -12,6 +12,7 @@ use DB;
 use CMRL\Equipment;
 use CMRL\Maintainence;
 use CMRL\apiuser;
+use CMRL\history;
 use Auth;
 use CMRL\Http\Requests;
 use CMRL\Http\Controllers\Controller;

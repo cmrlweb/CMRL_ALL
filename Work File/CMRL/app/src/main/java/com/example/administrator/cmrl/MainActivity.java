@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -40,9 +41,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnLogout;
     private Button btnqrcode;
     private Button btnPending;
+    private Button btnsync;
     private SQLiteHandler db;
     private SessionManager session;
 
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogout = (Button) findViewById(R.id.btnLogout);
         btnqrcode = (Button) findViewById(R.id.btnqrcode);
         btnPending = (Button) findViewById(R.id.btnPending);
+        btnsync = (Button) findViewById(R.id.btnSynchronize);
 
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
@@ -113,8 +118,79 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(pintent,1);
             }
         });
+        btnsync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                syncdata();
+            }
+        });
+    }
 
+    private void syncdata() {
+        String asset_req = "Sync_Request";
 
+        StringRequest req = new StringRequest(Request.Method.POST,
+                AppConfig.URL_SYNC,new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "AssetCode Response: " + response);
+
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+                    JSONArray MachineDesc =jObj.getJSONArray("MachineDesc");
+                    JSONArray Value =jObj.getJSONArray("Machvalue");
+
+                    // Check for error node in json
+                    if (!error) {
+                        for(int i=0;i < MachineDesc.length(); i++)
+                        {
+                            CheckBox cb = new CheckBox(getApplicationContext());
+                            String Machinefunc = MachineDesc.getJSONObject(i).getString("name");
+                            cb.setText(Machinefunc);
+                            Log.v(TAG, Machinefunc);
+
+                            if(Value.getJSONObject(i).getInt("name") != 0)
+                            {
+                                cb.setChecked(true);
+                            }
+                            cb.setTextColor(Color.BLACK);
+                            IL.addView(cb);
+                            CheckBoxList.add(cb);
+                        }
+                        AssetCode.setText(ASSETCODE);
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Response was bad.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.v(TAG, "Error in Json Object");
+                }
+            }
+
+        },new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Sync Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(),
+                        error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<>();
+                params.put("Sync", "true");
+                return params;
+            }
+
+        };
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(req, asset_req);
     }
 
     /**

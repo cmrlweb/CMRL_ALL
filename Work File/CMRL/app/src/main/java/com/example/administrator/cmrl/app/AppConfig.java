@@ -14,4 +14,6 @@ public class AppConfig {
     public static String URL_ASSETCODE = "http://192.168.202.43/api/assetcode";
 
     public static String URL_POSTASSET = "http://192.168.202.43/api/postdata";
+
+    public static String URL_SYNC = "http://192.168.202.43/api/syncdata";
 }
