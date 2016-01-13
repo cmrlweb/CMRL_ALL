@@ -19,6 +19,7 @@ Route::get('/',['middleware' => 'auth','uses' => 'HomeController@index']);
 Route::post('/api/login','AndroidController@login');
 Route::post('/api/postdata','AndroidController@postdata');
 Route::post('/api/assetcode','AndroidController@assetcode');
+Route::post('/api/syncdata','AndroidController@syncdata');
 
 Route::get('/android/register',['middleware' => 'auth','uses' => 'AndroidController@register']);
 Route::post('/android/register',['middleware' => 'auth','uses' => 'AndroidController@storeuser']);

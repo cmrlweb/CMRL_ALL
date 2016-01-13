@@ -139,27 +139,10 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
-                    JSONArray MachineDesc =jObj.getJSONArray("MachineDesc");
-                    JSONArray Value =jObj.getJSONArray("Machvalue");
 
                     // Check for error node in json
                     if (!error) {
-                        for(int i=0;i < MachineDesc.length(); i++)
-                        {
-                            CheckBox cb = new CheckBox(getApplicationContext());
-                            String Machinefunc = MachineDesc.getJSONObject(i).getString("name");
-                            cb.setText(Machinefunc);
-                            Log.v(TAG, Machinefunc);
-
-                            if(Value.getJSONObject(i).getInt("name") != 0)
-                            {
-                                cb.setChecked(true);
-                            }
-                            cb.setTextColor(Color.BLACK);
-                            IL.addView(cb);
-                            CheckBoxList.add(cb);
-                        }
-                        AssetCode.setText(ASSETCODE);
+                        
                     }
                     else{
                         Toast.makeText(MainActivity.this, "Response was bad.", Toast.LENGTH_SHORT).show();

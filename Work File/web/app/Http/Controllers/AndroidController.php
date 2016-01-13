@@ -197,4 +197,15 @@ class AndroidController extends Controller
 
         $historyuser->save();
     }
+
+    public function syncdata()
+    {
+        $sync = Input::get('Sync');
+
+        if($sync)
+        {
+            $response["error"]="false";
+            return json_encode($response);
+        }
+    }
 }
