@@ -205,11 +205,9 @@ class AndroidController extends Controller
         if($sync)
         {
             $response["error"]="false";
-            return json_encode($response);
-
             $EquipmentDetails = Equipment::all();
 
-            foreach($EquipmentDetails as $i => $equip){
+            foreach($EquipmentDetails as $index => $equip){
                 $response["Equipment"][$index]["Ecode"] = $equip->Ecode;
                 $response["Equipment"][$index]["Value"] = $equip->Name;
             }
@@ -220,6 +218,7 @@ class AndroidController extends Controller
                 $response["Maintainence"][$index]["Ecode"] = $Maintain->Ecode;
                 $response["Maintainence"][$index]["Value"] = $Maintain->Name; 
             } 
+            return json_encode($response);
         }
     }
 }

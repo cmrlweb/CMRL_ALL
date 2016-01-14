@@ -3,6 +3,7 @@ package com.example.administrator.cmrl;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import com.example.administrator.cmrl.helper.Pendingtasks;
 import com.example.administrator.cmrl.helper.SQLiteHandler;
 import com.example.administrator.cmrl.helper.SessionManager;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -147,10 +149,15 @@ public class MainActivity extends AppCompatActivity {
 
                     // Check for error node in json
                     if (!error) {
-                        FileOutputStream overWrite = new FileOutputStream("/data/data/com.administrator.cmrl/files/" + "Syncdata.txt", false);
+                        //File mFolder = new File("dataSync");
+                        //if (!mFolder.exists()) {
+                        //    mFolder.mkdir();
+                        //}
+                        FileOutputStream overWrite = openFileOutput("Syncdata.txt", Context.MODE_PRIVATE);
                         OutputStreamWriter osw = null;
                         osw = new OutputStreamWriter(overWrite);
                         osw.write(data);
+                        osw.flush();
                         osw.close();
                         overWrite.close();
                         Log.v(TAG,"File Saved Succesfully");

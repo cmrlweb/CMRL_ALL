@@ -14,6 +14,7 @@ import android.support.design.widget.TabLayout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -61,7 +62,6 @@ import java.util.Map;
 public class EquipmentActivity extends AppCompatActivity {
 
     private static final String TAG = EquipmentActivity.class.getSimpleName();
-    public SyncAdapter Syncer = new SyncAdapter(getApplicationContext(),true);
     private TextView AssetCode;
     private Button proceed;
     private Button goback;
@@ -70,7 +70,12 @@ public class EquipmentActivity extends AppCompatActivity {
     private SQLiteHandler db;
     private LinearLayout IL;
     private String nowTime;
+    private Integer MAINEcode;
     private String CheckBoxValues;
+    private final List<String> Equipments = new ArrayList<String>();
+    private final List<String> MaintainenceList = new ArrayList<String>();
+    private final List<String> EcodeMaintainenceList = new ArrayList<String>();
+    private final List<String> EcodeEquipList = new ArrayList<String>();
     private List<CheckBox> CheckBoxList = new ArrayList<CheckBox>();
 
     @Override
@@ -79,6 +84,7 @@ public class EquipmentActivity extends AppCompatActivity {
             setContentView(R.layout.activity_equipment);
 
             db = new SQLiteHandler(getApplicationContext());
+            IL = (LinearLayout) findViewById(R.id.llFinner);
 
             // Fetching user details from sqlite
             HashMap<String, String> user = db.getUserDetails();
@@ -108,11 +114,12 @@ public class EquipmentActivity extends AppCompatActivity {
                             proceed.setText("Save Data");
                         }
                         else
-                        {   final List<String> Equipments = new ArrayList<String>();
-                            final List<String> MaintainenceList = new ArrayList<String>();
-                            final List<String> EcodeMaintainenceList = new ArrayList<String>();
-                            final List<String> EcodeEquipList = new ArrayList<String>();
+                        {
                             try {
+                                //File mFolder = new File("dataSync");
+                                //if (!mFolder.exists()) {
+                                //    mFolder.mkdir();
+                                //}
                                 FileInputStream Syncdata = openFileInput("Syncdata.txt");
                                 BufferedInputStream inRd = new BufferedInputStream(Syncdata);
                                 StringBuffer b = new StringBuffer();
@@ -163,32 +170,38 @@ public class EquipmentActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // TODO Auto-generated method stub
-                                    for(int i=0;i<Equipments.size();i++)
+                                    int i=0;
+                                    while(i<Equipments.size())
                                     {
                                         if(which == i)
                                         {
-                                            String Ecode = EcodeEquipList.get(i);
+                                            MAINEcode = Integer.parseInt(EcodeEquipList.get(i));
+                                            Log.v(TAG, "Main Ecode is" + MAINEcode);
 
-                                            for(int j=0;j<EcodeMaintainenceList.size();j++)
-                                            {
-                                                if(EcodeMaintainenceList.get(j) == Ecode)
-                                                {
-                                                    String MachineDescription = MaintainenceList.get(j);
+                                            for(int index=0;index<MaintainenceList.size();index++) {
+
+                                                Integer Ecodething = Integer.parseInt(EcodeMaintainenceList.get(index));
+                                                Log.v(TAG,"The Value came :"+Ecodething+" ");
+                                                if(Ecodething == MAINEcode) {
+                                                    Log.v(TAG, "YES");
                                                     CheckBox cb = new CheckBox(getApplicationContext());
-                                                    cb.setText(MachineDescription);
+                                                    String MaintainenceValue = MaintainenceList.get(index);
+                                                    cb.setText(MaintainenceValue);
+                                                    Log.v(TAG, MaintainenceValue);
+                                                    cb.setTextColor(Color.BLACK);
+                                                    IL.addView(cb);
                                                     CheckBoxList.add(cb);
-                                                    Log.v(TAG,"Sync Data Values");
+                                                    proceed.setText("Save Data");
                                                 }
                                             }
+
                                         }
+                                        i++;
                                     }
                                 }
                             });
+                            alertDialog.setCancelable(true);
                             alertDialog.show();
-
-                            //Syncer.
-                            Syncer.syncImmediately(getApplicationContext());
-
                             Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -234,6 +247,22 @@ public class EquipmentActivity extends AppCompatActivity {
                 }
             });
 
+    }
+
+    private void SetCheckBoxesofSync() {
+        for(int i=0;i<MaintainenceList.size();i++)
+        {
+            if(EcodeMaintainenceList.get(i) == String.valueOf(MAINEcode))
+            {
+                CheckBox cb = new CheckBox(getApplicationContext());
+                String MaintainenceValue = MaintainenceList.get(i);
+                cb.setText(MaintainenceValue);
+                Log.v(TAG,MaintainenceValue);
+                cb.setTextColor(Color.BLACK);
+                IL.addView(cb);
+                CheckBoxList.add(cb);
+            }
+        }
     }
 
     private boolean isNetworkAvailable() {
