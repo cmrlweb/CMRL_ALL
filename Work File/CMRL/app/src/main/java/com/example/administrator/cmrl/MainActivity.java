@@ -28,6 +28,10 @@ import com.example.administrator.cmrl.helper.Pendingtasks;
 import com.example.administrator.cmrl.helper.SQLiteHandler;
 import com.example.administrator.cmrl.helper.SessionManager;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -138,11 +142,18 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     JSONObject jObj = new JSONObject(response);
+                    String data = jObj.toString();
                     boolean error = jObj.getBoolean("error");
 
                     // Check for error node in json
                     if (!error) {
-                        
+                        FileOutputStream overWrite = new FileOutputStream("/data/data/com.administrator.cmrl/files/" + "Syncdata.txt", false);
+                        OutputStreamWriter osw = null;
+                        osw = new OutputStreamWriter(overWrite);
+                        osw.write(data);
+                        osw.close();
+                        overWrite.close();
+                        Log.v(TAG,"File Saved Succesfully");
                     }
                     else{
                         Toast.makeText(MainActivity.this, "Response was bad.", Toast.LENGTH_SHORT).show();
@@ -150,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.v(TAG, "Error in Json Object");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 

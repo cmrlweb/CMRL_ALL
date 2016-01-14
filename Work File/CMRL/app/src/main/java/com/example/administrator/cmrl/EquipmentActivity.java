@@ -12,6 +12,12 @@ import android.os.Bundle;
 
 import android.support.design.widget.TabLayout;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -102,24 +108,85 @@ public class EquipmentActivity extends AppCompatActivity {
                             proceed.setText("Save Data");
                         }
                         else
-                        { /*
-                            CharSequence features[] = new CharSequence[] {"TVS_FAN","TVS_DAMPER"};
+                        {   final List<String> Equipments = new ArrayList<String>();
+                            final List<String> MaintainenceList = new ArrayList<String>();
+                            final List<String> EcodeMaintainenceList = new ArrayList<String>();
+                            final List<String> EcodeEquipList = new ArrayList<String>();
+                            try {
+                                FileInputStream Syncdata = openFileInput("Syncdata.txt");
+                                BufferedInputStream inRd = new BufferedInputStream(Syncdata);
+                                StringBuffer b = new StringBuffer();
+
+                                while(inRd.available()!=0)
+                                {
+                                    char c = (char) inRd.read();
+                                    b.append(c);
+                                }
+
+                                JSONObject jObj = new JSONObject(b.toString());
+                                boolean error = jObj.getBoolean("error");
+                                JSONArray Equipment = jObj.getJSONArray("Equipment");
+                                JSONArray Maintainence = jObj.getJSONArray("Maintainence");
+
+                                for(int i=0;i<Equipment.length();i++)
+                                {
+                                    String Ecode = Equipment.getJSONObject(i).getString("Ecode");
+                                    String EquipmentName = Equipment.getJSONObject(i).getString("Value");
+                                    EcodeEquipList.add(Ecode);
+                                    Equipments.add(EquipmentName);
+                                }
+
+                                for(int i=0;i<Maintainence.length();i++)
+                                {
+                                    String Ecode = Maintainence.getJSONObject(i).getString("Ecode");
+                                    EcodeMaintainenceList.add(Ecode);
+                                    String MachineDescSync = Maintainence.getJSONObject(i).getString("Value");
+                                    MaintainenceList.add(MachineDescSync);
+                                }
+
+                                inRd.close();
+                                Syncdata.close();
+
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            final CharSequence[] charSequenceItems = Equipments.toArray(new CharSequence[Equipments.size()]);
                             AlertDialog.Builder alertDialog = new AlertDialog.Builder(EquipmentActivity.this);
                             alertDialog.setTitle("Options");
-                            alertDialog.setItems(features, new DialogInterface.OnClickListener() {
+                            alertDialog.setItems(charSequenceItems, new DialogInterface.OnClickListener() {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // TODO Auto-generated method stub
-                                    if (which == 0) {
-                                        // handle "TVS_FAN" option
-                                    } else if (which == 1) {
-                                        // handle "TVS_DAMPER" option
+                                    for(int i=0;i<Equipments.size();i++)
+                                    {
+                                        if(which == i)
+                                        {
+                                            String Ecode = EcodeEquipList.get(i);
+
+                                            for(int j=0;j<EcodeMaintainenceList.size();j++)
+                                            {
+                                                if(EcodeMaintainenceList.get(j) == Ecode)
+                                                {
+                                                    String MachineDescription = MaintainenceList.get(j);
+                                                    CheckBox cb = new CheckBox(getApplicationContext());
+                                                    cb.setText(MachineDescription);
+                                                    CheckBoxList.add(cb);
+                                                    Log.v(TAG,"Sync Data Values");
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             });
                             alertDialog.show();
-                            */
+
+                            //Syncer.
                             Syncer.syncImmediately(getApplicationContext());
 
                             Toast.makeText(EquipmentActivity.this, "Network Not Available.", Toast.LENGTH_SHORT).show();

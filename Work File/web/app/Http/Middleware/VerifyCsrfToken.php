@@ -15,5 +15,6 @@ class VerifyCsrfToken extends BaseVerifier
         'api/login',
         'api/assetcode',
         'api/postdata',
+        'api/syncdata',
     ];
 }

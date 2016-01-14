@@ -18,12 +18,14 @@
     <string name="btn_qrcode">QRCODE</string>
     <string name="name">Fullname</string>
     <string name="btn_pending">Pending</string>
+    <string name="btn_link_host">Set Host</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_qr">QRActivity</string>
     <string name="title_activity_equipment">EquipmentActivity</string>
     <string name="sync_account_type">administrator.example.com</string>
     <string name="content_authority">com.example.android.administrator.cmrl</string>
+    <string name="default_host">192.168.202.43</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
