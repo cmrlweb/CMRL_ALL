@@ -142,11 +142,11 @@ class AssetsController extends Controller
 
         if($mod == 'Edit')
         {
-            // $asset->save();
+            $asset->save();
         }
         elseif($mod == 'Delete')
         {
-            // $asset->delete();
+            $asset->delete();
         }
          return Redirect::to('/');
     }
@@ -181,6 +181,9 @@ class AssetsController extends Controller
         $Equip = new Equipment;
         $Equip->Ecode = Input::get('Ecode');
         $Equip->Name = Input::get('Ename');
+
+        $Equip->save();
+        
         return Redirect::to('/');
 
     }
